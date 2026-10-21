@@ -7,13 +7,13 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.php 
+     * Run the migrations.php
      */
     public function up(): void
     {
         Schema::create('books', function (Blueprint $table) {
             $table->id();
-             $table->string('file_cover');
+            $table->string('file_cover');
             $table->string('file_books');
             $table->string('name');
             $table->year('published_year');

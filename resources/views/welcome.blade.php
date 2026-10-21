@@ -1,342 +1,472 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    @vite('resources/css/app.css')
-    <title>Perpustakan Bps</title>
-</head>
-<body data-template-id="__page-root" style="background: rgb(248, 251, 255);">
-  <div class="page-shell">
-   <header class="glass-header sticky top-0 z-40">
-    <div class="site-width flex h-[68px] items-center justify-between gap-4"><a href="#beranda" class="flex items-center gap-2 no-underline" aria-label="Kembali ke Beranda"> <span class="flex h-9 w-9 items-center justify-center rounded-lg text-[#0b4c95]"><i data-lucide="book-open" class="h-5 w-5"></i><img src="{{ asset('assets/images/logo-bps.svg')}}" alt="Logo Bps"></span> <span data-template-id="brand-name" class="canva-text text-[11px] font-extrabold leading-[.95] tracking-[-.04em]" style="color: rgb(8, 43, 98); font-weight: 800; font-style: normal; font-size: 11px;">PERPUSTAKAAN
-BPS KABUPATEN JEMBER</span> </a>
-     <nav aria-label="Navigasi utama" class="nav-scroll hidden items-center gap-6 md:flex"><a data-template-id="nav-home" class="canva-link nav-link" href="#beranda" style="color: rgb(48, 68, 97); font-weight: 600; font-style: normal; font-size: 16px;">Beranda</a> <a data-template-id="nav-catalog" class="canva-link nav-link" href="#katalog" style="color: rgb(48, 68, 97); font-weight: 600; font-style: normal; font-size: 16px;">Katalog Buku</a> <a data-template-id="nav-collection" class="canva-link nav-link" href="#koleksi" style="color: rgb(48, 68, 97); font-weight: 600; font-style: normal; font-size: 16px;">Koleksi</a> <a data-template-id="nav-about" class="canva-link nav-link" href="#tentang" style="color: rgb(48, 68, 97); font-weight: 600; font-style: normal; font-size: 16px;">Tentang Kami</a>
-     </nav>
-     <div class="flex items-center gap-2"><button id="header-search" type="button" class="rounded-lg p-2 text-[#183a66] hover:bg-[#edf6ff] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1565c0]" aria-label="Fokus ke pencarian katalog"> <i data-lucide="search" class="h-5 w-5"></i> </button> <button id="login-trigger" data-template-id="login-button" type="button" class="canva-button rounded-lg px-3.5 py-2 text-xs font-bold shadow-sm transition hover:brightness-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e9ad36]" style="background: rgb(8, 43, 98); color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;">Masuk</button>
-     </div>
+@extends('guest.layouts.app')
+
+@section('title', 'Perpustakaan Digital BPS Kabupaten Jember - Publikasi Statistik Resmi')
+
+@section('content')
+<!-- Hero Section -->
+<section id="beranda" class="relative pt-10 pb-16 md:pt-16 md:pb-24 overflow-hidden">
+  <!-- Blue background illustration -->
+  <div class="absolute inset-0 -z-10 h-[560px] w-full">
+    <img 
+      src="{{ asset('assets/images/bg-biru.svg') }}" 
+      alt="Background Perpustakaan BPS" 
+      class="h-full w-full object-cover"
+    >
+  </div>
+
+  <div class="site-width grid items-center gap-10 lg:grid-cols-12">
+    <!-- Left Hero Content -->
+    <div class="lg:col-span-7 pt-4">
+      <div class="mb-4 inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-extrabold bg-blue-100 text-blue-900 border border-blue-200">
+        <i data-lucide="award" class="h-3.5 w-3.5 text-blue-700"></i>
+        <span>PERPUSTAKAAN DIGITAL RESMI BPS JEMBER</span>
+      </div>
+
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-black leading-tight text-white tracking-tight">
+        Akses Publikasi Statistik Resmi & Terpercaya
+      </h1>
+
+      <p class="mt-4 max-w-xl text-sm md:text-base text-blue-50 leading-relaxed font-normal">
+        Temukan data agregat, publikasi kecamatan dalam angka, indikator ekonomi regional (PDRB), kependudukan, serta buku statistik resmi Kabupaten Jember secara lengkap dan mudah dibaca.
+      </p>
+
+      <div class="mt-8 flex flex-wrap gap-4 items-center">
+        <a 
+          href="{{ route('katalog.index') }}" 
+          class="inline-flex items-center gap-2 rounded-xl bg-yellow-400 px-6 py-3.5 text-sm font-extrabold text-slate-900 shadow-lg hover:bg-yellow-300 transition transform hover:-translate-y-0.5"
+        >
+          <i data-lucide="book-open" class="h-4 w-4"></i>
+          <span>Jelajahi Daftar Katalog</span>
+        </a>
+
+        <a 
+          href="#katalog" 
+          class="inline-flex items-center gap-2 rounded-xl border border-white/40 bg-white/10 backdrop-blur-xs px-6 py-3.5 text-sm font-bold text-white hover:bg-white/20 transition"
+        >
+          <i data-lucide="search" class="h-4 w-4"></i>
+          <span>Cari Publikasi</span>
+        </a>
+      </div>
+
+      <!-- Quick Metrics -->
+      <div class="mt-10 grid grid-cols-3 gap-4 max-w-lg border-t border-white/20 pt-6">
+        <div>
+          <div class="text-2xl sm:text-3xl font-black text-white">{{ $totalBooks }}</div>
+          <div class="text-xs text-blue-200 mt-0.5">Buku Publikasi</div>
+        </div>
+        <div>
+          <div class="text-2xl sm:text-3xl font-black text-white">{{ $totalCategories }}</div>
+          <div class="text-xs text-blue-200 mt-0.5">Kategori Statistik</div>
+        </div>
+        <div>
+          <div class="text-2xl sm:text-3xl font-black text-yellow-300">Gratis</div>
+          <div class="text-xs text-blue-200 mt-0.5">Akses Terbuka</div>
+        </div>
+      </div>
     </div>
-   </header>
-   <main>
-    <section id="beranda" class="relative py-10 md:py-14">
-     <div class="site-width grid items-center gap-9 lg:grid-cols-[1.02fr_.98fr]">
-      <div class="fade-up">
-       <div data-template-id="hero-eyebrow" class="canva-tag mb-4 inline-flex rounded-full px-3 py-1 text-xs font-bold" style="background: rgb(226, 241, 255); color: rgb(20, 96, 174); font-weight: 700; font-style: normal; font-size: 12px;">PERPUSTAKAAN UNTUK SEMUA</div>
-       <h1 data-template-id="hero-title" class="canva-text max-w-[620px] text-4xl font-extrabold leading-[1.1] tracking-[-.045em] md:text-5xl" style="color: rgb(16, 41, 77); font-weight: 800; font-style: normal; font-size: 32px;">Temukan Dunia Baru Lewat Setiap Halaman.</h1>
-       <p data-template-id="hero-description" class="canva-text mt-5 max-w-[550px] text-[15px] leading-7" style="color: rgb(93, 112, 138); font-weight: 400; font-style: normal; font-size: 15px; line-height: 1.7;">Jelajahi ribuan koleksi buku dan temukan bacaan yang sesuai untuk memperluas wawasanmu.</p>
-       <div class="mt-7 flex flex-wrap gap-3"><button id="explore-button" data-template-id="explore-button-text" type="button" class="canva-button inline-flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e9ad36]" style="background: rgb(11, 85, 170); color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;">Jelajahi Koleksi</button> <button id="catalog-button" data-template-id="catalog-button-text" type="button" class="canva-button inline-flex items-center gap-2 rounded-lg border px-5 py-3 text-sm font-bold transition hover:bg-[#f2f8ff] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1565c0]" style="background: rgb(255, 255, 255); color: rgb(23, 75, 135); font-weight: 700; font-style: normal; font-size: 16px;">Lihat Katalog</button>
-       </div>
+
+    <!-- Right Hero Art -->
+    <div class="lg:col-span-5 hidden lg:block">
+      <div class="relative rounded-3xl bg-white/10 backdrop-blur-md p-6 border border-white/20 shadow-2xl">
+        <div class="flex items-center justify-between pb-4 border-b border-white/15">
+          <div class="flex items-center gap-2">
+            <span class="h-3 w-3 rounded-full bg-red-400"></span>
+            <span class="h-3 w-3 rounded-full bg-yellow-400"></span>
+            <span class="h-3 w-3 rounded-full bg-green-400"></span>
+          </div>
+          <span class="text-xs font-bold text-blue-100 tracking-wider">PORTAL PERPUSTAKAAN BPS</span>
+        </div>
+
+        <div class="mt-4 flex gap-4 items-center">
+          <div class="w-32 aspect-[3/4] rounded-xl overflow-hidden shadow-lg border border-white/20 shrink-0">
+            <img 
+              src="{{ asset('assets/images/cover-buku1.jpg') }}" 
+              alt="Sampul Publikasi Terpilih" 
+              class="w-full h-full object-cover"
+            >
+          </div>
+          <div class="text-white text-xs space-y-2">
+            <span class="rounded bg-yellow-400 text-slate-900 font-extrabold px-2 py-0.5 text-[10px] uppercase">
+              Rekomendasi
+            </span>
+            <h4 class="font-extrabold text-sm leading-snug">Kabupaten Jember Dalam Angka 2026</h4>
+            <p class="text-blue-100 line-clamp-3">Menyajikan data menyeluruh terkait geografi, sosial, kependudukan, hingga makro ekonomi Kabupaten Jember.</p>
+            <a href="{{ route('katalog.index') }}" class="inline-flex items-center gap-1 text-yellow-300 font-bold hover:underline">
+              <span>Buka di Katalog</span>
+              <i data-lucide="arrow-right" class="h-3 w-3"></i>
+            </a>
+          </div>
+        </div>
       </div>
-      <div class="hero-art fade-up" style="animation-delay:.12s" aria-label="Ilustrasi pembaca sedang membaca di depan rak buku">
-       <div class="dots absolute bottom-8 left-7 h-14 w-14 opacity-70"></div>
-       <div class="bookshelf" aria-hidden="true"><span class="shelf"></span><span class="shelf"></span><span class="shelf"></span> <span class="book-spine" style="left:13px;height:43px;background:#e4ad35"></span><span class="book-spine" style="left:29px;height:50px;background:#55a7ce"></span><span class="book-spine" style="left:46px;height:38px;background:#e36855"></span><span class="book-spine" style="left:64px;height:52px;background:#f2d67d"></span><span class="book-spine" style="left:86px;height:45px;background:#72b58f"></span><span class="book-spine" style="left:108px;height:56px;background:#b0d3ee"></span><span class="book-spine" style="left:132px;height:41px;background:#e6a9a3"></span>
-       </div>
-       <div class="reader" aria-hidden="true">
-        <span class="head"></span><span class="hair"></span><span class="body"></span><span class="leg one"></span><span class="leg two"></span><span class="reading-book"></span>
-       </div>
-       <div class="plant text-5xl" aria-hidden="true">
-        ♣
-       </div>
-      </div>
-     </div>
-    </section>
-    <section id="katalog" class="pb-7">
-     <div class="site-width">
-      <form id="catalog-form" class="search-panel grid gap-3 rounded-2xl bg-white p-4 md:grid-cols-[1fr_auto]" role="search"><label class="sr-only" for="catalog-search">Cari judul buku, penulis, atau kategori</label>
-       <div class="flex items-center gap-3 rounded-xl border border-[#d8e6f4] bg-[#fbfdff] px-4"><i data-lucide="search" class="h-5 w-5 text-[#5b7190]"></i> <input id="catalog-search" data-template-id="search-input" class="canva-input h-12 w-full border-0 bg-transparent text-sm text-[#13213a] outline-none placeholder:text-[#91a1b4]" type="search" placeholder="Cari judul buku, penulis, atau kategori..." style="color: rgb(19, 33, 58); font-weight: 400; font-style: normal; font-size: 14px;">
-       </div><button data-template-id="search-button" type="submit" class="canva-button rounded-xl px-7 py-3 text-sm font-bold transition hover:brightness-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e9ad36]" style="background: rgb(11, 85, 170); color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;">Cari</button>
+    </div>
+  </div>
+</section>
+
+<!-- Search Section -->
+<section id="katalog" class="pt-4 pb-8">
+  <div class="site-width">
+    <div class="rounded-2xl bg-white p-5 md:p-6 shadow-md border border-slate-200/90 -mt-6 relative z-20">
+      <form action="{{ route('katalog.index') }}" method="GET" class="grid gap-3 md:grid-cols-[1fr_auto]">
+        <div class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/60 px-4 focus-within:border-blue-600 focus-within:bg-white transition">
+          <i data-lucide="search" class="h-5 w-5 text-slate-400"></i>
+          <input 
+            type="search" 
+            name="search" 
+            id="catalog-search"
+            placeholder="Cari judul publikasi, nama kecamatan, PDRB, tahun terbit..." 
+            class="h-12 w-full border-0 bg-transparent text-sm text-slate-800 placeholder:text-slate-400 outline-none"
+          >
+        </div>
+        <button 
+          type="submit" 
+          class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#082b62] px-8 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#114b9c] transition active:scale-95"
+        >
+          <i data-lucide="search" class="h-4 w-4"></i>
+          <span>Cari di Katalog</span>
+        </button>
       </form>
-     </div>
-    </section>
-    <section id="koleksi" class="py-7">
-     <div class="site-width">
-      <div class="mb-5 flex items-end justify-between gap-4">
-       <div>
-        <h2 data-template-id="categories-title" class="canva-text text-xl font-extrabold tracking-[-.03em]" style="color: rgb(19, 33, 58); font-weight: 800; font-style: normal; font-size: 24px;">Kategori Populer</h2>
-        <p data-template-id="categories-description" class="canva-text mt-1 text-sm" style="color: rgb(100, 116, 139); font-weight: 400; font-style: normal; font-size: 14px;">Pilih kategori untuk menemukan bacaan favoritmu.</p>
-       </div><button id="clear-filter" data-template-id="view-all-button" class="canva-button text-xs font-bold underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1565c0]" type="button" style="color: rgb(11, 85, 170); font-weight: 700; font-style: normal; font-size: 16px;">Lihat Semua</button>
-      </div>
-      <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5"><button type="button" class="category-card is-active rounded-xl border border-[#e2edf7] bg-white p-4 text-center" data-category="all" aria-pressed="true"> <span class="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-[#e6f3ff] text-[#1765b8]"><i data-lucide="layout-grid" class="h-5 w-5"></i></span> <span data-template-id="category-all" class="canva-text mt-2 block text-sm font-bold" style="color: rgb(24, 54, 84); font-weight: 700; font-style: normal; font-size: 16px;">Semua</span> <span data-template-id="category-all-count" class="canva-text mt-1 block text-[10px]" style="color: rgb(122, 141, 163); font-weight: 400; font-style: normal; font-size: 10px;">Koleksi pilihan</span> </button> <button type="button" class="category-card rounded-xl border border-[#e2edf7] bg-white p-4 text-center" data-category="Pendidikan" aria-pressed="false"> <span class="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-[#dcefff] text-[#1765b8]"><i data-lucide="graduation-cap" class="h-5 w-5"></i></span> <span data-template-id="category-education" class="canva-text mt-2 block text-sm font-bold" style="color: rgb(24, 54, 84); font-weight: 700; font-style: normal; font-size: 16px;">Pendidikan</span> <span data-template-id="category-education-count" class="canva-text mt-1 block text-[10px]" style="color: rgb(122, 141, 163); font-weight: 400; font-style: normal; font-size: 10px;">1.264 Buku</span> </button> <button type="button" class="category-card rounded-xl border border-[#e2edf7] bg-white p-4 text-center" data-category="Teknologi" aria-pressed="false"> <span class="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-[#d9f4f1] text-[#16857d]"><i data-lucide="laptop" class="h-5 w-5"></i></span> <span data-template-id="category-tech" class="canva-text mt-2 block text-sm font-bold" style="color: rgb(24, 54, 84); font-weight: 700; font-style: normal; font-size: 16px;">Teknologi</span> <span data-template-id="category-tech-count" class="canva-text mt-1 block text-[10px]" style="color: rgb(122, 141, 163); font-weight: 400; font-style: normal; font-size: 10px;">832 Buku</span> </button> <button type="button" class="category-card rounded-xl border border-[#e2edf7] bg-white p-4 text-center" data-category="Sains" aria-pressed="false"> <span class="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-[#eee6ff] text-[#7454c7]"><i data-lucide="flask-conical" class="h-5 w-5"></i></span> <span data-template-id="category-science" class="canva-text mt-2 block text-sm font-bold" style="color: rgb(24, 54, 84); font-weight: 700; font-style: normal; font-size: 16px;">Sains</span> <span data-template-id="category-science-count" class="canva-text mt-1 block text-[10px]" style="color: rgb(122, 141, 163); font-weight: 400; font-style: normal; font-size: 10px;">786 Buku</span> </button> <button type="button" class="category-card rounded-xl border border-[#e2edf7] bg-white p-4 text-center" data-category="Sastra" aria-pressed="false"> <span class="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-[#fff0cf] text-[#bd7e16]"><i data-lucide="book-heart" class="h-5 w-5"></i></span> <span data-template-id="category-literature" class="canva-text mt-2 block text-sm font-bold" style="color: rgb(24, 54, 84); font-weight: 700; font-style: normal; font-size: 16px;">Sastra</span> <span data-template-id="category-literature-count" class="canva-text mt-1 block text-[10px]" style="color: rgb(122, 141, 163); font-weight: 400; font-style: normal; font-size: 10px;">1.032 Buku</span> </button>
-      </div>
-     </div>
-    </section>
-    <!-- card buku -->
-    <section class="py-7">
-     <div class="site-width">
-      <div class="mb-5">
-       <h2 data-template-id="books-title" class="canva-text text-xl font-extrabold tracking-[-.03em]" style="color: rgb(19, 33, 58); font-weight: 800; font-style: normal; font-size: 24px;">Buku Populer</h2>
-       <p id="results-message" class="mt-1 min-h-[20px] text-sm text-[#64748b]" aria-live="polite"></p>
-      </div>
-      <div id="book-grid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-       <article class="book-card overflow-hidden rounded-md border border-[#e0ebf5] bg-white" data-title="Laut Bercerita" data-author="Leila S. Chudori" data-category="Sastra">
-        <div class="cover bg-[#2f719a] aspect-[3/4] w-full">
-         <img src="{{ asset('assets/images/cover-buku1.jpg')}}" alt="cover buku" class="w-full h-full object-cover">
-        </div>
-        <div class="p-4"><span data-template-id="book-1-category" class="canva-tag text-[10px] font-bold uppercase tracking-wider" style="color: rgb(36, 116, 109); font-weight: 700; font-style: normal; font-size: 16px;">Sastra</span>
-         <h3 data-template-id="book-1-title" class="canva-text mt-2 text-[15px] font-extrabold leading-tight" style="color: rgb(23, 42, 67); font-weight: 800; font-style: normal; font-size: 19px;">Laut Bercerita</h3>
-         <p data-template-id="book-1-author" class="canva-text mt-1 text-xs" style="color: rgb(112, 129, 152); font-weight: 400; font-style: normal; font-size: 12px;">Leila S. Chudori</p>
-         <div class="mt-3 flex items-center gap-1 text-[#df9d1f]">
-          <i data-lucide="star" class="h-3.5 w-3.5 fill-current"></i><span data-template-id="book-1-rating" class="canva-text text-xs font-bold" style="color: rgb(84, 106, 132); font-weight: 700; font-style: normal; font-size: 12px;">4.8 (320)</span>
-         </div><button data-template-id="book-1-detail" data-book="Laut Bercerita" type="button" class="canva-button mt-4 w-full rounded-lg border px-3 py-2 text-xs font-bold" style="background: rgb(255, 255, 255); color: rgb(11, 85, 170); font-weight: 700; font-style: normal; font-size: 16px;">Lihat Detail</button>
-        </div>
-       </article>
-       <article class="book-card overflow-hidden rounded-md border border-[#e0ebf5] bg-white" data-title="Atomic Habits" data-author="James Clear" data-category="Pendidikan">
-        <div class="cover bg-[#f1ead9] aspect-[3/4] w-full">
-         <img src="{{ asset('assets/images/cover-buku2.jpg')}}" alt="cover buku" class="w-full h-full object-cover">
-        </div>
-        <div class="p-4"><span data-template-id="book-2-category" class="canva-tag text-[10px] font-bold uppercase tracking-wider" style="color: rgb(36, 116, 109); font-weight: 700; font-style: normal; font-size: 16px;">Pendidikan</span>
-         <h3 data-template-id="book-2-title" class="canva-text mt-2 text-[15px] font-extrabold leading-tight" style="color: rgb(23, 42, 67); font-weight: 800; font-style: normal; font-size: 19px;">Atomic Habits</h3>
-         <p data-template-id="book-2-author" class="canva-text mt-1 text-xs" style="color: rgb(112, 129, 152); font-weight: 400; font-style: normal; font-size: 12px;">James Clear</p>
-         <div class="mt-3 flex items-center gap-1 text-[#df9d1f]">
-          <i data-lucide="star" class="h-3.5 w-3.5 fill-current"></i><span data-template-id="book-2-rating" class="canva-text text-xs font-bold" style="color: rgb(84, 106, 132); font-weight: 700; font-style: normal; font-size: 12px;">4.9 (416)</span>
-         </div><button data-template-id="book-2-detail" data-book="Atomic Habits" type="button" class="canva-button mt-4 w-full rounded-lg border px-3 py-2 text-xs font-bold" style="background: rgb(255, 255, 255); color: rgb(11, 85, 170); font-weight: 700; font-style: normal; font-size: 16px;">Lihat Detail</button>
-        </div>
-       </article>
-       <article class="book-card overflow-hidden rounded-md border border-[#e0ebf5] bg-white" data-title="Sapiens" data-author="Yuval Noah Harari" data-category="Sejarah">
-        <div class="cover bg-[#1c2933] aspect-[3/4] w-full">
-         <img src="{{ asset('assets/images/cover-buku3.jpg')}}" alt="cover buku" class="w-full h-full object-cover">
-        </div>
-        <div class="p-4"><span data-template-id="book-3-category" class="canva-tag text-[10px] font-bold uppercase tracking-wider" style="color: rgb(36, 116, 109); font-weight: 700; font-style: normal; font-size: 16px;">Sejarah</span>
-         <h3 data-template-id="book-3-title" class="canva-text mt-2 text-[15px] font-extrabold leading-tight" style="color: rgb(23, 42, 67); font-weight: 800; font-style: normal; font-size: 19px;">Sapiens</h3>
-         <p data-template-id="book-3-author" class="canva-text mt-1 text-xs" style="color: rgb(112, 129, 152); font-weight: 400; font-style: normal; font-size: 12px;">Yuval Noah Harari</p>
-         <div class="mt-3 flex items-center gap-1 text-[#df9d1f]">
-          <i data-lucide="star" class="h-3.5 w-3.5 fill-current"></i><span data-template-id="book-3-rating" class="canva-text text-xs font-bold" style="color: rgb(84, 106, 132); font-weight: 700; font-style: normal; font-size: 12px;">4.7 (299)</span>
-         </div><button data-template-id="book-3-detail" data-book="Sapiens" type="button" class="canva-button mt-4 w-full rounded-lg border px-3 py-2 text-xs font-bold" style="background: rgb(255, 255, 255); color: rgb(11, 85, 170); font-weight: 700; font-style: normal; font-size: 16px;">Lihat Detail</button>
-        </div>
-       </article>
-       <article class="book-card overflow-hidden rounded-md border border-[#e0ebf5] bg-white" data-title="Laskar Pelangi" data-author="Andrea Hirata" data-category="Sastra">
-        <div class="cover bg-[#e9c56b] aspect-[3/4] w-full">
-         <img src="{{ asset('assets/images/cover-buku4.jpg')}}" alt="cover buku" class="w-full h-full object-cover">
-        </div>
-        <div class="p-4"><span data-template-id="book-4-category" class="canva-tag text-[10px] font-bold uppercase tracking-wider" style="color: rgb(36, 116, 109); font-weight: 700; font-style: normal; font-size: 16px;">Sastra</span>
-         <h3 data-template-id="book-4-title" class="canva-text mt-2 text-[15px] font-extrabold leading-tight" style="color: rgb(23, 42, 67); font-weight: 800; font-style: normal; font-size: 19px;">Laskar Pelangi</h3>
-         <p data-template-id="book-4-author" class="canva-text mt-1 text-xs" style="color: rgb(112, 129, 152); font-weight: 400; font-style: normal; font-size: 12px;">Andrea Hirata</p>
-         <div class="mt-3 flex items-center gap-1 text-[#df9d1f]">
-          <!-- <i data-lucide="star" class="h-3.5 w-3.5 fill-current"></i><span data-template-id="book-4-rating" class="canva-text text-xs font-bold" style="color: rgb(84, 106, 132); font-weight: 700; font-style: normal; font-size: 12px;">4.8 (281)</span> -->
-         </div><button data-template-id="book-4-detail" data-book="Laskar Pelangi" type="button" class="canva-button mt-4 w-full rounded-lg border px-3 py-2 text-xs font-bold" style="background: rgb(255, 255, 255); color: rgb(11, 85, 170); font-weight: 700; font-style: normal; font-size: 16px;">Lihat Detail</button>
-        </div>
-       </article>
-       <article class="book-card overflow-hidden rounded-md border border-[#e0ebf5] bg-white" data-title="Bumi" data-author="Tere Liye" data-category="Sains">
-        <div class="cover bg-[#246d66] aspect-[3/4] w-full">
-         <img src="{{ asset('assets/images/cover-buku5.jpg')}}" alt="cover buku" class="w-full h-full object-cover">
-        </div>
-        <div class="p-4"><span data-template-id="book-5-category" class="canva-tag text-[10px] font-bold uppercase tracking-wider" style="color: rgb(36, 116, 109); font-weight: 700; font-style: normal; font-size: 16px;">Sains</span>
-         <h3 data-template-id="book-5-title" class="canva-text mt-2 text-[15px] font-extrabold leading-tight" style="color: rgb(23, 42, 67); font-weight: 800; font-style: normal; font-size: 19px;">Bumi</h3>
-         <p data-template-id="book-5-author" class="canva-text mt-1 text-xs" style="color: rgb(112, 129, 152); font-weight: 400; font-style: normal; font-size: 12px;">Tere Liye</p>
-         <div class="mt-3 flex items-center gap-1 text-[#df9d1f]">
-          <i data-lucide="star" class="h-3.5 w-3.5 fill-current"></i><span data-template-id="book-5-rating" class="canva-text text-xs font-bold" style="color: rgb(84, 106, 132); font-weight: 700; font-style: normal; font-size: 12px;">4.8 (403)</span>
-         </div><button data-template-id="book-5-detail" data-book="Bumi" type="button" class="canva-button mt-4 w-full rounded-lg border px-3 py-2 text-xs font-bold" style="background: rgb(255, 255, 255); color: rgb(11, 85, 170); font-weight: 700; font-style: normal; font-size: 16px;">Lihat Detail</button>
-        </div>
-       </article>
-      </div>
-      <p id="empty-state" data-template-id="empty-state" class="canva-text hidden rounded-xl border border-dashed border-[#cbdceb] bg-white p-8 text-center text-sm" style="color: rgb(100, 116, 139); font-weight: 400; font-style: normal; font-size: 14px;">Belum ada buku yang sesuai. Coba gunakan kata kunci atau kategori lain.</p>
-     </div>
-    </section>
-
-  <!-- card buku -->
-      <section class="py-7">
-     <div class="site-width">
-      <div class="mb-5">
-       <h2 data-template-id="books-title" class="canva-text text-xl font-extrabold tracking-[-.03em]" style="color: rgb(19, 33, 58); font-weight: 800; font-style: normal; font-size: 24px;">Buku Populer</h2>
-       <p id="results-message" class="mt-1 min-h-[20px] text-sm text-[#64748b]" aria-live="polite"></p>
-      </div>
-      <div id="book-grid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-       <article class="book-card overflow-hidden rounded-md border border-[#e0ebf5] bg-white" data-title="Laut Bercerita" data-author="Leila S. Chudori" data-category="Sastra">
-        <div class="cover aspect-[3/4] w-full">
-          <img src="{{ asset('assets/images/cover-buku.jpeg')}}" alt="cover buku" class="w-full h-full object-cover">
-              </div>
-        <div class="p-4"><span data-template-id="book-1-category" class="canva-tag text-[10px] font-bold uppercase tracking-wider" style="color: rgb(36, 116, 109); font-weight: 700; font-style: normal; font-size: 16px;">Sastra</span>
-         <h3 data-template-id="book-1-title" class="canva-text mt-2 text-[15px] font-extrabold leading-tight" style="color: rgb(23, 42, 67); font-weight: 800; font-style: normal; font-size: 19px;">Laut Bercerita</h3>
-         <p data-template-id="book-1-author" class="canva-text mt-1 text-xs" style="color: rgb(112, 129, 152); font-weight: 400; font-style: normal; font-size: 12px;">Leila S. Chudori</p>
-         <div class="mt-3 flex items-center gap-1 text-[#df9d1f]">
-          <i data-lucide="star" class="h-3.5 w-3.5 fill-current"></i><span data-template-id="book-1-rating" class="canva-text text-xs font-bold" style="color: rgb(84, 106, 132); font-weight: 700; font-style: normal; font-size: 12px;">4.8 (320)</span>
-         </div><button data-template-id="book-1-detail" data-book="Laut Bercerita" type="button" class="canva-button mt-4 w-full rounded-lg border px-3 py-2 text-xs font-bold" style="background: rgb(255, 255, 255); color: rgb(11, 85, 170); font-weight: 700; font-style: normal; font-size: 16px;">Lihat Detail</button>
-        </div>
-       </article>
-       <article class="book-card overflow-hidden rounded-md border border-[#e0ebf5] bg-white" data-title="Atomic Habits" data-author="James Clear" data-category="Pendidikan">
-        <div class="cover bg-[#f1ead9] aspect-[3/4] w-full">
-         <img src="{{ asset('assets/images/cover-buku5.jpg')}}" alt="cover buku" class="w-full h-full object-cover">
-        </div>
-        <div class="p-4"><span data-template-id="book-2-category" class="canva-tag text-[10px] font-bold uppercase tracking-wider" style="color: rgb(36, 116, 109); font-weight: 700; font-style: normal; font-size: 16px;">Pendidikan</span>
-         <h3 data-template-id="book-2-title" class="canva-text mt-2 text-[15px] font-extrabold leading-tight" style="color: rgb(23, 42, 67); font-weight: 800; font-style: normal; font-size: 19px;">Atomic Habits</h3>
-         <p data-template-id="book-2-author" class="canva-text mt-1 text-xs" style="color: rgb(112, 129, 152); font-weight: 400; font-style: normal; font-size: 12px;">James Clear</p>
-         <div class="mt-3 flex items-center gap-1 text-[#df9d1f]">
-          <i data-lucide="star" class="h-3.5 w-3.5 fill-current"></i><span data-template-id="book-2-rating" class="canva-text text-xs font-bold" style="color: rgb(84, 106, 132); font-weight: 700; font-style: normal; font-size: 12px;">4.9 (416)</span>
-         </div><button data-template-id="book-2-detail" data-book="Atomic Habits" type="button" class="canva-button mt-4 w-full rounded-lg border px-3 py-2 text-xs font-bold" style="background: rgb(255, 255, 255); color: rgb(11, 85, 170); font-weight: 700; font-style: normal; font-size: 16px;">Lihat Detail</button>
-        </div>
-       </article>
-       <article class="book-card overflow-hidden rounded-md border border-[#e0ebf5] bg-white" data-title="Sapiens" data-author="Yuval Noah Harari" data-category="Sejarah">
-        <div class="cover bg-[#1c2933] aspect-[3/4] w-full">
-         <img src="{{ asset('assets/images/cover-buku1.jpg')}}" alt="cover buku" class="w-full h-full object-cover">
-        </div>
-        <div class="p-4"><span data-template-id="book-3-category" class="canva-tag text-[10px] font-bold uppercase tracking-wider" style="color: rgb(36, 116, 109); font-weight: 700; font-style: normal; font-size: 16px;">Sejarah</span>
-         <h3 data-template-id="book-3-title" class="canva-text mt-2 text-[15px] font-extrabold leading-tight" style="color: rgb(23, 42, 67); font-weight: 800; font-style: normal; font-size: 19px;">Sapiens</h3>
-         <p data-template-id="book-3-author" class="canva-text mt-1 text-xs" style="color: rgb(112, 129, 152); font-weight: 400; font-style: normal; font-size: 12px;">Yuval Noah Harari</p>
-         <div class="mt-3 flex items-center gap-1 text-[#df9d1f]">
-          <i data-lucide="star" class="h-3.5 w-3.5 fill-current"></i><span data-template-id="book-3-rating" class="canva-text text-xs font-bold" style="color: rgb(84, 106, 132); font-weight: 700; font-style: normal; font-size: 12px;">4.7 (299)</span>
-         </div><button data-template-id="book-3-detail" data-book="Sapiens" type="button" class="canva-button mt-4 w-full rounded-lg border px-3 py-2 text-xs font-bold" style="background: rgb(255, 255, 255); color: rgb(11, 85, 170); font-weight: 700; font-style: normal; font-size: 16px;">Lihat Detail</button>
-        </div>
-       </article>
-       <article class="book-card overflow-hidden rounded-md border border-[#e0ebf5] bg-white" data-title="Laskar Pelangi" data-author="Andrea Hirata" data-category="Sastra">
-        <div class="cover bg-[#e9c56b] aspect-[3/4] w-full">
-         <img src="{{ asset('assets/images/cover-buku2.jpg')}}" alt="cover buku" class="w-full h-full object-cover">
-        </div>
-        <div class="p-4"><span data-template-id="book-4-category" class="canva-tag text-[10px] font-bold uppercase tracking-wider" style="color: rgb(36, 116, 109); font-weight: 700; font-style: normal; font-size: 16px;">Sastra</span>
-         <h3 data-template-id="book-4-title" class="canva-text mt-2 text-[15px] font-extrabold leading-tight" style="color: rgb(23, 42, 67); font-weight: 800; font-style: normal; font-size: 19px;">Laskar Pelangi</h3>
-         <p data-template-id="book-4-author" class="canva-text mt-1 text-xs" style="color: rgb(112, 129, 152); font-weight: 400; font-style: normal; font-size: 12px;">Andrea Hirata</p>
-         <div class="mt-3 flex items-center gap-1 text-[#df9d1f]">
-          <i data-lucide="star" class="h-3.5 w-3.5 fill-current"></i><span data-template-id="book-4-rating" class="canva-text text-xs font-bold" style="color: rgb(84, 106, 132); font-weight: 700; font-style: normal; font-size: 12px;">4.8 (281)</span>
-         </div><button data-template-id="book-4-detail" data-book="Laskar Pelangi" type="button" class="canva-button mt-4 w-full rounded-lg border px-3 py-2 text-xs font-bold" style="background: rgb(255, 255, 255); color: rgb(11, 85, 170); font-weight: 700; font-style: normal; font-size: 16px;">Lihat Detail</button>
-        </div>
-       </article>
-       <article class="book-card overflow-hidden rounded-md border border-[#e0ebf5] bg-white" data-title="Bumi" data-author="Tere Liye" data-category="Sains">
-        <div class="cover bg-[#246d66] aspect-[3/4] w-full">
-         <img src="{{ asset('assets/images/cover-buku3.jpg')}}" alt="cover buku" class="w-full h-full object-cover">
-        </div>
-        <div class="p-4"><span data-template-id="book-5-category" class="canva-tag text-[10px] font-bold uppercase tracking-wider" style="color: rgb(36, 116, 109); font-weight: 700; font-style: normal; font-size: 16px;">Sains</span>
-         <h3 data-template-id="book-5-title" class="canva-text mt-2 text-[15px] font-extrabold leading-tight" style="color: rgb(23, 42, 67); font-weight: 800; font-style: normal; font-size: 19px;">Bumi</h3>
-         <p data-template-id="book-5-author" class="canva-text mt-1 text-xs" style="color: rgb(112, 129, 152); font-weight: 400; font-style: normal; font-size: 12px;">Tere Liye</p>
-         <div class="mt-3 flex items-center gap-1 text-[#df9d1f]">
-          <i data-lucide="star" class="h-3.5 w-3.5 fill-current"></i><span data-template-id="book-5-rating" class="canva-text text-xs font-bold" style="color: rgb(84, 106, 132); font-weight: 700; font-style: normal; font-size: 12px;">4.8 (403)</span>
-         </div><button data-template-id="book-5-detail" data-book="Bumi" type="button" class="canva-button mt-4 w-full rounded-lg border px-3 py-2 text-xs font-bold" style="background: rgb(255, 255, 255); color: rgb(11, 85, 170); font-weight: 700; font-style: normal; font-size: 16px;">Lihat Detail</button>
-        </div>
-       </article>
-      </div>
-      <p id="empty-state" data-template-id="empty-state" class="canva-text hidden rounded-xl border border-dashed border-[#cbdceb] bg-white p-8 text-center text-sm" style="color: rgb(100, 116, 139); font-weight: 400; font-style: normal; font-size: 14px;">Belum ada buku yang sesuai. Coba gunakan kata kunci atau kategori lain.</p>
-     </div>
-    <section class="py-8">
-     <div class="site-width">
-      <div data-template-id="cta-banner" class="canva-banner relative overflow-hidden rounded-2xl p-7 md:flex md:items-center md:justify-between md:p-9" style="background: linear-gradient(115deg, rgb(8, 43, 98), rgb(18, 105, 191));">
-       <div class="relative z-10">
-        <h2 data-template-id="cta-title" class="canva-text text-2xl font-extrabold tracking-[-.035em]" style="color: rgb(255, 255, 255); font-weight: 800; font-style: normal; font-size: 24px;">Belum menemukan buku yang kamu cari?</h2>
-        <p data-template-id="cta-description" class="canva-text mt-2 max-w-[590px] text-sm leading-6" style="color: rgb(216, 236, 255); font-weight: 400; font-style: normal; font-size: 14px;">Cari di katalog lengkap kami dan temukan banyak koleksi menarik lainnya.</p>
-       </div><button id="cta-catalog-button" data-template-id="cta-button" type="button" class="canva-button relative z-10 mt-5 rounded-lg px-5 py-3 text-sm font-bold shadow-md transition hover:-translate-y-0.5 md:mt-0" style="background: rgb(255, 255, 255); color: rgb(11, 85, 170); font-weight: 700; font-style: normal; font-size: 16px;">Cari di Katalog Lengkap</button> <i data-lucide="book-open" class="absolute -bottom-8 right-5 h-40 w-40 rotate-[-13deg] text-white opacity-15"></i>
-      </div>
-     </div>
-    </section>
-   </main>
-   <footer id="tentang" data-template-id="footer-section" class="canva-footer mt-4" style="background: rgb(8, 43, 98); color: rgb(214, 232, 250);">
-    <div class="site-width grid gap-8 py-10 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1.2fr_1fr]">
-     <section>
-      <div class="flex items-center gap-2"><span class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15"><i data-lucide="book-open" class="h-4 w-4"></i></span>
-       <h2 data-template-id="footer-brand" class="canva-text text-xs font-extrabold" style="color: rgb(255, 255, 255); font-weight: 800; font-style: normal; font-size: 24px;">PERPUSTAKAAN DIGITAL</h2>
-      </div>
-      <p data-template-id="footer-description" class="canva-text mt-4 max-w-[220px] text-xs leading-5" style="color: rgb(189, 215, 238); font-weight: 400; font-style: normal; font-size: 12px;">Membuka akses pengetahuan untuk belajar, tumbuh, dan menginspirasi.</p>
-     </section>
-     <section>
-      <h3 data-template-id="footer-menu-title" class="canva-text text-sm font-bold" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 19px;">Menu</h3>
-      <div class="mt-3 grid gap-2 text-xs">
-       <a data-template-id="footer-menu-home" class="canva-link" href="#beranda" style="color: rgb(189, 215, 238); font-weight: 400; font-style: normal; font-size: 12px;">Beranda</a><a data-template-id="footer-menu-catalog" class="canva-link" href="#katalog" style="color: rgb(189, 215, 238); font-weight: 400; font-style: normal; font-size: 12px;">Katalog Buku</a><a data-template-id="footer-menu-collection" class="canva-link" href="#koleksi" style="color: rgb(189, 215, 238); font-weight: 400; font-style: normal; font-size: 12px;">Koleksi</a>
-      </div>
-     </section>
-     <section>
-      <h3 data-template-id="footer-info-title" class="canva-text text-sm font-bold" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 19px;">Informasi</h3>
-      <div class="mt-3 grid gap-2 text-xs">
-       <span data-template-id="footer-info-1" class="canva-text" style="color: rgb(189, 215, 238); font-weight: 400; font-style: normal; font-size: 12px;">Cara Peminjaman</span><span data-template-id="footer-info-2" class="canva-text" style="color: rgb(189, 215, 238); font-weight: 400; font-style: normal; font-size: 12px;">Ketentuan Layanan</span><span data-template-id="footer-info-3" class="canva-text" style="color: rgb(189, 215, 238); font-weight: 400; font-style: normal; font-size: 12px;">Bantuan</span>
-      </div>
-     </section>
-     <section>
-      <h3 data-template-id="footer-contact-title" class="canva-text text-sm font-bold" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 19px;">Kontak Kami</h3>
-      <div class="mt-3 grid gap-2 text-xs">
-       <span data-template-id="footer-address" class="canva-text" style="color: rgb(189, 215, 238); font-weight: 400; font-style: normal; font-size: 12px;">Jl. Pengetahuan No. 18, Surabaya</span><span data-template-id="footer-phone" class="canva-text" style="color: rgb(189, 215, 238); font-weight: 400; font-style: normal; font-size: 12px;">(031) 555-0198</span><span data-template-id="footer-email" class="canva-text" style="color: rgb(189, 215, 238); font-weight: 400; font-style: normal; font-size: 12px;">info@perpusdigital.id</span>
-      </div>
-     </section>
-     <section>
-      <h3 data-template-id="footer-hours-title" class="canva-text text-sm font-bold" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 19px;">Jam Layanan</h3>
-      <div class="mt-3 grid gap-2 text-xs">
-       <span data-template-id="footer-hours-weekday" class="canva-text" style="color: rgb(189, 215, 238); font-weight: 400; font-style: normal; font-size: 12px;">Senin–Jumat: 08.00–20.00 WIB</span><span data-template-id="footer-hours-weekend" class="canva-text" style="color: rgb(189, 215, 238); font-weight: 400; font-style: normal; font-size: 12px;">Sabtu: 09.00–16.00 WIB</span>
-      </div>
-     </section>
     </div>
-    <div class="border-t border-white/15">
-     <div data-template-id="copyright" class="canva-text site-width py-4 text-center text-[11px]" style="color: rgb(158, 194, 225); font-weight: 400; font-style: normal; font-size: 11px;">© 2026 Perpustakaan Digital. All rights reserved.</div>
-    </div>
-   </footer>
   </div>
-  <div id="login-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-[#071d3a]/55 p-4" role="dialog" aria-modal="true" aria-labelledby="login-title">
-   <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-    <div class="flex items-start justify-between gap-4">
-     <div>
-      <h2 id="login-title" data-template-id="modal-title" class="canva-text text-xl font-extrabold" style="color: rgb(19, 33, 58); font-weight: 800; font-style: normal; font-size: 24px;">Masuk ke Perpustakaan</h2>
-      <p data-template-id="modal-description" class="canva-text mt-1 text-sm" style="color: rgb(100, 116, 139); font-weight: 400; font-style: normal; font-size: 14px;">Akses anggota akan segera tersedia.</p>
-     </div><button id="close-modal" type="button" class="rounded-lg p-2 text-[#46617f] hover:bg-[#edf6ff]" aria-label="Tutup dialog"><i data-lucide="x" class="h-5 w-5"></i></button>
+</section>
+
+<!-- Kategori Populer -->
+<section id="koleksi" class="py-8">
+  <div class="site-width">
+    <div class="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+      <div>
+        <span class="text-xs font-bold uppercase tracking-wider text-blue-700">Klasifikasi Data</span>
+        <h2 class="text-2xl font-extrabold text-[#082b62] tracking-tight">Kategori Publikasi Statistik</h2>
+        <p class="mt-1 text-xs md:text-sm text-slate-500">Pilih rumpun kategori untuk menemukan publikasi yang sesuai kebutuhan riset Anda.</p>
+      </div>
+      <a 
+        href="{{ route('katalog.index') }}" 
+        class="inline-flex items-center gap-1 text-xs font-bold text-[#1565c0] hover:underline underline-offset-4"
+      >
+        <span>Lihat Semua Katalog</span>
+        <i data-lucide="arrow-right" class="h-3.5 w-3.5"></i>
+      </a>
     </div>
-    <div class="mt-6 rounded-xl bg-[#f1f7fd] p-4">
-     <p data-template-id="modal-note" class="canva-text text-sm leading-6" style="color: rgb(49, 82, 113); font-weight: 400; font-style: normal; font-size: 14px; line-height: 1.6;">Halaman ini adalah katalog terbuka. Kamu tetap dapat menjelajahi koleksi dan mencari buku tanpa masuk.</p>
-    </div><button id="cancel-modal" data-template-id="modal-close-button" type="button" class="canva-button mt-6 w-full rounded-lg px-4 py-3 text-sm font-bold" style="background: rgb(11, 85, 170); color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;">Kembali ke Katalog</button>
-   </div>
+
+    <!-- Category Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+      <!-- All Categories Card -->
+      <a 
+        href="{{ route('katalog.index') }}" 
+        class="group flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-5 text-center shadow-xs hover:border-blue-400 hover:shadow-md transition"
+      >
+        <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-[#1565c0] group-hover:scale-110 transition">
+          <i data-lucide="layout-grid" class="h-6 w-6"></i>
+        </span>
+        <span class="mt-3 block text-sm font-bold text-slate-800 group-hover:text-blue-700 transition">Semua Kategori</span>
+        <span class="mt-0.5 block text-[11px] text-slate-500">{{ $totalBooks }} Publikasi</span>
+      </a>
+
+      @foreach($categories as $index => $cat)
+        @php
+          $icons = ['map-pin', 'trending-up', 'users', 'briefcase', 'book-open'];
+          $icon = $icons[$index % count($icons)];
+        @endphp
+        <a 
+          href="{{ route('katalog.index', ['kategori' => $cat->id]) }}" 
+          class="group flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-5 text-center shadow-xs hover:border-blue-400 hover:shadow-md transition"
+        >
+          <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-700 group-hover:scale-110 transition">
+            <i data-lucide="{{ $icon }}" class="h-6 w-6"></i>
+          </span>
+          <span class="mt-3 block text-sm font-bold text-slate-800 group-hover:text-blue-700 transition truncate max-w-[150px]">
+            {{ $cat->name }}
+          </span>
+          <span class="mt-0.5 block text-[11px] text-slate-500">{{ $cat->books_count }} Buku</span>
+        </a>
+      @endforeach
+    </div>
   </div>
-  <script src="/_sdk/0aac212797dcb9a6.editing_sdk.js" integrity="sha512-U1Z5TGB/MTX0fFSADhP7rVM3+UzJJjKTapiY1vm1cxcbcyWo4eBuCJNJO6zARJ5kHopP9UvWNtPszOqzRc1ICA=="></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
+</section>
 
-      const searchInput = document.getElementById('catalog-search');
-      const bookCards = [...document.querySelectorAll('.book-card')];
-      const categoryButtons = [...document.querySelectorAll('.category-card')];
-      const results = document.getElementById('results-message');
-      const emptyState = document.getElementById('empty-state');
-      let activeCategory = 'all';
+<!-- Featured Books (Koleksi Buku Populer) -->
+<section class="py-8">
+  <div class="site-width">
+    <div class="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+      <div>
+        <span class="text-xs font-bold uppercase tracking-wider text-blue-700">Koleksi Terpopuler</span>
+        <h2 class="text-2xl font-extrabold text-[#082b62] tracking-tight">Buku & Publikasi Terbaru</h2>
+        <p class="mt-1 text-xs md:text-sm text-slate-500">Klik "Baca Sekarang" untuk membaca langsung dokumen publikasi resmi secara online.</p>
+      </div>
 
-      function filterBooks() {
-        const query = searchInput.value.trim().toLowerCase();
-        let visible = 0;
-        bookCards.forEach(card => {
-          const searchable = (card.dataset.title + ' ' + card.dataset.author + ' ' + card.dataset.category).toLowerCase();
-          const categoryMatch = activeCategory === 'all' || card.dataset.category === activeCategory;
-          const match = categoryMatch && searchable.includes(query);
-          card.classList.toggle('hidden', !match);
-          if (match) visible++;
-        });
-        emptyState.classList.toggle('hidden', visible !== 0);
-        results.textContent = query || activeCategory !== 'all'
-          ? `${visible} buku ditemukan${activeCategory !== 'all' ? ' dalam kategori ' + activeCategory : ''}.`
-          : '';
-      }
+      <a 
+        href="{{ route('katalog.index') }}" 
+        class="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition shadow-xs"
+      >
+        <span>Buka Seluruh Katalog ({{ $totalBooks }})</span>
+        <i data-lucide="arrow-right" class="h-3.5 w-3.5"></i>
+      </a>
+    </div>
 
-      document.getElementById('catalog-form').addEventListener('submit', event => { event.preventDefault(); filterBooks(); });
-      searchInput.addEventListener('input', filterBooks);
-      document.getElementById('header-search').addEventListener('click', () => {
-        document.getElementById('katalog').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        setTimeout(() => searchInput.focus(), 450);
+    <!-- Books Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      @foreach($featuredBooks as $book)
+        <article class="group flex flex-col justify-between rounded-2xl border border-slate-200/90 bg-white shadow-xs hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+          
+          <!-- Cover Container -->
+          <div class="relative aspect-[3/4] w-full overflow-hidden bg-slate-100">
+            <img 
+              src="{{ $book->cover_url }}" 
+              alt="{{ $book->name }}" 
+              loading="lazy"
+              class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              onerror="this.src='{{ asset('assets/images/cover-buku1.jpg') }}'"
+            >
+
+            <!-- Badges -->
+            <div class="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
+              <span class="rounded-md bg-[#082b62]/90 backdrop-blur-xs px-2.5 py-1 text-[11px] font-bold text-white shadow-xs">
+                {{ $book->category?->name ?? 'Statistik' }}
+              </span>
+              <span class="rounded-md bg-white/95 backdrop-blur-xs px-2 py-0.5 text-[11px] font-extrabold text-[#082b62] shadow-xs">
+                {{ $book->published_year }}
+              </span>
+            </div>
+
+            <!-- Quick Action Hover Overlay -->
+            <div class="absolute inset-0 bg-[#082b62]/75 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-4 gap-2.5 backdrop-blur-xs">
+              <a 
+                href="{{ route('katalog.baca', $book) }}" 
+                class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-yellow-400 px-4 py-2.5 text-xs font-extrabold text-[#082b62] shadow-md hover:bg-yellow-300 transition transform hover:scale-105"
+              >
+                <i data-lucide="book-open" class="h-4 w-4"></i>
+                <span>Baca Buku Sekarang</span>
+              </a>
+              <button 
+                type="button" 
+                onclick="openBookDetailHome({{ $book->id }})"
+                class="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-white/90 px-4 py-2 text-xs font-bold text-slate-800 hover:bg-white transition"
+              >
+                <i data-lucide="info" class="h-4 w-4"></i>
+                <span>Detail & Ringkasan</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Metadata -->
+          <div class="flex flex-1 flex-col justify-between p-4 sm:p-5">
+            <div>
+              <span class="text-[11px] font-bold text-blue-700 uppercase tracking-wider block mb-1">
+                {{ $book->category?->name }}
+              </span>
+              <h3 class="text-sm font-bold text-slate-900 leading-snug line-clamp-2 group-hover:text-[#1565c0] transition">
+                <a href="{{ route('katalog.baca', $book) }}">
+                  {{ $book->name }}
+                </a>
+              </h3>
+              <p class="mt-2 text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                {{ $book->describe }}
+              </p>
+            </div>
+
+            <!-- Bottom Actions -->
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center gap-2">
+              <a 
+                href="{{ route('katalog.baca', $book) }}" 
+                class="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#082b62] px-3.5 py-2 text-xs font-bold text-white shadow-xs hover:bg-[#124b96] transition"
+              >
+                <i data-lucide="book-open" class="h-3.5 w-3.5"></i>
+                <span>Baca</span>
+              </a>
+
+              <button 
+                type="button" 
+                onclick="openBookDetailHome({{ $book->id }})"
+                class="rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-50 hover:text-blue-700 transition" 
+                title="Lihat Detail"
+              >
+                <i data-lucide="eye" class="h-4 w-4"></i>
+              </button>
+            </div>
+          </div>
+
+        </article>
+      @endforeach
+    </div>
+
+    <!-- CTA Section to Full Catalog -->
+    <div class="mt-12 text-center">
+      <div class="inline-flex flex-col sm:flex-row items-center gap-4 rounded-3xl bg-blue-50/80 border border-blue-200/60 p-6 md:p-8">
+        <div class="text-left">
+          <h3 class="text-lg font-black text-[#082b62]">Ingin melihat seluruh publikasi statistik lainnya?</h3>
+          <p class="text-xs md:text-sm text-slate-600 mt-1">Gunakan filter kategori lengkap, pencarian tahun terbit, dan urutan buku pada Daftar Katalog.</p>
+        </div>
+        <a 
+          href="{{ route('katalog.index') }}" 
+          class="shrink-0 inline-flex items-center gap-2 rounded-2xl bg-[#082b62] px-6 py-3.5 text-xs font-bold text-white shadow-md hover:bg-blue-900 transition"
+        >
+          <i data-lucide="library" class="h-4 w-4"></i>
+          <span>Buka Daftar Katalog Lengkap</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- About Section -->
+<section class="py-12 bg-white border-t border-slate-200/80">
+  <div class="site-width">
+    <div class="rounded-3xl p-8 md:p-12 text-white shadow-xl relative overflow-hidden" style="background: linear-gradient(115deg, rgb(8, 43, 98), rgb(18, 105, 191));">
+      <!-- Decorative circle -->
+      <div class="absolute -right-20 -bottom-20 w-80 h-80 rounded-full bg-white/5 pointer-events-none"></div>
+
+      <div class="max-w-3xl relative z-10">
+        <div class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-yellow-300 mb-3 border border-white/15">
+          <i data-lucide="building-2" class="h-3.5 w-3.5"></i>
+          <span>TENTANG BPS KABUPATEN JEMBER</span>
+        </div>
+
+        <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white leading-tight">
+          Menyediakan Data Statistik Berkualitas untuk Pembangunan Indonesia Maju
+        </h2>
+
+        <p class="mt-4 text-xs md:text-sm text-blue-100 leading-relaxed font-normal">
+          Badan Pusat Statistik adalah Lembaga Pemerintah Non Kementerian yang bertanggung jawab langsung kepada Presiden Republik Indonesia berdasarkan Undang-Undang Nomor 16 Tahun 1997 tentang Statistik. Melalui Perpustakaan Digital ini, BPS Kabupaten Jember berkomitmen mempermudah akses bagi akademisi, peneliti, mahasiswa, pemerintah daerah, dan masyarakat umum dalam memperoleh data statistik yang valid, akurat, dan terpercaya.
+        </p>
+
+        <div class="mt-8 flex flex-wrap gap-4 items-center text-xs">
+          <a 
+            href="{{ route('katalog.index') }}" 
+            class="inline-flex items-center gap-2 rounded-xl bg-yellow-400 px-5 py-3 font-extrabold text-slate-900 shadow-md hover:bg-yellow-300 transition"
+          >
+            <i data-lucide="book-marked" class="h-4 w-4"></i>
+            <span>Mulai Jelajah Koleksi</span>
+          </a>
+
+          <a 
+            href="https://jemberkab.bps.go.id" 
+            target="_blank" 
+            class="inline-flex items-center gap-2 rounded-xl border border-white/30 px-5 py-3 font-bold text-white hover:bg-white/10 transition"
+          >
+            <span>Kunjungi Web Resmi BPS Jember</span>
+            <i data-lucide="external-link" class="h-3.5 w-3.5"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Detail Modal for Homepage -->
+<div id="homeDetailModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-[#071d3a]/65 backdrop-blur-xs p-4" role="dialog" aria-modal="true">
+  <div class="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-white shadow-2xl p-6 sm:p-8">
+    <button 
+      type="button" 
+      onclick="closeBookDetailHome()" 
+      class="absolute top-5 right-5 rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
+      aria-label="Tutup"
+    >
+      <i data-lucide="x" class="h-5 w-5"></i>
+    </button>
+
+    <div id="homeModalLoading" class="py-12 text-center text-slate-500">
+      <div class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent"></div>
+      <p class="mt-3 text-xs">Memuat publikasi...</p>
+    </div>
+
+    <div id="homeModalContent" class="hidden flex-col sm:flex-row gap-6 items-start">
+      <div class="w-full sm:w-48 shrink-0 aspect-[3/4] rounded-2xl overflow-hidden shadow-md bg-slate-100">
+        <img id="hmCover" src="" alt="Cover Buku" class="w-full h-full object-cover">
+      </div>
+
+      <div class="flex-1 flex flex-col justify-between">
+        <div>
+          <div class="flex flex-wrap items-center gap-2 mb-2">
+            <span id="hmCategory" class="rounded-full bg-blue-100 px-3 py-0.5 text-xs font-bold text-blue-800"></span>
+            <span id="hmYear" class="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-700"></span>
+          </div>
+
+          <h3 id="hmTitle" class="text-xl font-extrabold text-[#082b62] leading-tight"></h3>
+
+          <div class="mt-4 pt-3 border-t border-slate-100">
+            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Sinopsis:</h4>
+            <p id="hmDesc" class="text-xs text-slate-600 leading-relaxed"></p>
+          </div>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-slate-100 flex flex-wrap items-center gap-3">
+          <a 
+            id="hmReadBtn" 
+            href="#" 
+            class="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-[#082b62] px-5 py-3 text-xs font-bold text-white shadow-md hover:bg-blue-900 transition"
+          >
+            <i data-lucide="book-open" class="h-4 w-4"></i>
+            <span>Baca Sekarang</span>
+          </a>
+
+          <a 
+            id="hmPdfBtn" 
+            href="#" 
+            target="_blank" 
+            class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 px-4 py-3 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
+          >
+            <i data-lucide="download" class="h-4 w-4"></i>
+            <span>Unduh PDF</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+@endsection
+
+@push('scripts')
+<script>
+  const hmModal = document.getElementById('homeDetailModal');
+  const hmLoading = document.getElementById('homeModalLoading');
+  const hmContent = document.getElementById('homeModalContent');
+
+  function openBookDetailHome(bookId) {
+    if (!hmModal) return;
+    hmModal.classList.remove('hidden');
+    hmModal.classList.add('flex');
+    hmLoading.classList.remove('hidden');
+    hmContent.classList.add('hidden');
+    hmContent.classList.remove('flex');
+    document.body.classList.add('modal-open');
+
+    fetch(`/katalog/${bookId}/api`)
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('hmCover').src = data.cover_url;
+        document.getElementById('hmTitle').textContent = data.name;
+        document.getElementById('hmCategory').textContent = data.category;
+        document.getElementById('hmYear').textContent = 'Tahun ' + data.published_year;
+        document.getElementById('hmDesc').textContent = data.describe;
+        document.getElementById('hmReadBtn').href = data.read_url;
+        document.getElementById('hmPdfBtn').href = data.pdf_url;
+
+        hmLoading.classList.add('hidden');
+        hmContent.classList.remove('hidden');
+        hmContent.classList.add('flex');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+      })
+      .catch(err => {
+        console.error(err);
+        closeBookDetailHome();
       });
+  }
 
-      categoryButtons.forEach(button => button.addEventListener('click', () => {
-        activeCategory = button.dataset.category;
-        categoryButtons.forEach(item => {
-          const selected = item === button;
-          item.classList.toggle('is-active', selected);
-          item.setAttribute('aria-pressed', String(selected));
-        });
-        filterBooks();
-        document.querySelector('.book-card:not(.hidden), #empty-state').scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }));
+  function closeBookDetailHome() {
+    if (!hmModal) return;
+    hmModal.classList.add('hidden');
+    hmModal.classList.remove('flex');
+    document.body.classList.remove('modal-open');
+  }
 
-      document.getElementById('clear-filter').addEventListener('click', () => {
-        activeCategory = 'all';
-        searchInput.value = '';
-        categoryButtons.forEach((item, index) => { item.classList.toggle('is-active', index === 0); item.setAttribute('aria-pressed', String(index === 0)); });
-        filterBooks();
-      });
-
-      ['explore-button', 'catalog-button', 'cta-catalog-button'].forEach(id => document.getElementById(id).addEventListener('click', () => {
-        document.getElementById('koleksi').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }));
-
-      document.querySelectorAll('[data-book]').forEach(button => button.addEventListener('click', () => {
-        results.textContent = `“${button.dataset.book}” dipilih. Gunakan pencarian untuk menemukan buku lain yang relevan.`;
-        results.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }));
-
-      const modal = document.getElementById('login-modal');
-      const openModal = () => { modal.classList.remove('hidden'); modal.classList.add('flex'); document.body.classList.add('modal-open'); document.getElementById('close-modal').focus(); };
-      const closeModal = () => { modal.classList.add('hidden'); modal.classList.remove('flex'); document.body.classList.remove('modal-open'); document.getElementById('login-trigger').focus(); };
-      document.getElementById('login-trigger').addEventListener('click', openModal);
-      document.getElementById('close-modal').addEventListener('click', closeModal);
-      document.getElementById('cancel-modal').addEventListener('click', closeModal);
-      modal.addEventListener('click', event => { if (event.target === modal) closeModal(); });
-      document.addEventListener('keydown', event => { if (event.key === 'Escape' && !modal.classList.contains('hidden')) closeModal(); });
+  if (hmModal) {
+    hmModal.addEventListener('click', (e) => {
+      if (e.target === hmModal) closeBookDetailHome();
     });
-  </script>
- 
-</body></html>
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !hmModal.classList.contains('hidden')) {
+        closeBookDetailHome();
+      }
+    });
+  }
+</script>
+@endpush
